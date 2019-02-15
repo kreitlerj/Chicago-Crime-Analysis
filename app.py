@@ -28,8 +28,8 @@ Base = automap_base()
 Base.prepare(db.engine, reflect=True)
 
 # Save references to each table
-Samples_Metadata = Base.classes.sample_metadata
-Samples = Base.classes.samples
+crime_2017 = Base.classes.Crime_2017
+crime_2018 = Base.classes.Crime_2018
 
 
 @app.route("/")
@@ -38,63 +38,42 @@ def index():
     return render_template("chicago.html")
 
 
-@app.route("/names")
-def names():
-    """Return a list of sample names."""
+@app.route("/all_crime_data/")
+def allCrimeData():
+    """Return all crime data"""
+    monthly_crime_2017 = {}
+    monthly_crime_2018 = {}
+    for month in months_array:
+        monthly_crime_2017[month] = db.session.query(crime_2017).filter(crime_2017.Month == month).count()
+        monthly_crime_2018[month] = db.session.query(crime_2018).filter(crime_2018.Month == month).count()
+    
+    ward_2017 = {}
+    ward_2018 = {}
+    for i in range(1, 51):
+        ward_2017[i] = db.session.query(crime_2017).filter(crime_2017.Ward == float(i)).count()
+        ward_2018[i] = db.session.query(crime_2018).filter(crime_2018.Ward == float(i)).count()
 
-    # Use Pandas to perform the sql query
-    stmt = db.session.query(Samples).statement
-    df = pd.read_sql_query(stmt, db.session.bind)
+    data = {2017 : {monthly_crime_2017, ward_2017}, 2018: {monthly_crime_2018, ward_2018}}
 
-    # Return a list of the column names (sample names)
-    return jsonify(list(df.columns)[2:])
+    return jsonify(data)
 
+@app.route("/crime_data/<crime>")
+def crimeData(year):
+    """Return specfic crime data"""
+    monthly_crime_2017 = {}
+    monthly_crime_2018 = {}
+    for month in months_array:
+        monthly_crime_2017[month] = db.session.query(crime_2017).filter(crime_2017.Crime_Type == crime).filter(crime_2017.Month == month).count()
+        monthly_crime_2018[month] = db.session.query(crime_2018).filter(crime_2018.Crime_Type == crime).filter(crime_2018.Month == month).count()
+    
+    ward_2017 = {}
+    ward_2018 = {}
+    for i in range(1, 51):
+        ward_2017[i] = db.session.query(crime_2017).filter(crime_2017.Crime_Type == crime).filter(crime_2017.Ward == float(i)).count()
+        ward_2018[i] = db.session.query(crime_2018).filter(crime_2018.Crime_Type == crime).filter(crime_2018.Ward == float(i)).count()
 
-@app.route("/metadata/<sample>")
-def sample_metadata(sample):
-    """Return the MetaData for a given sample."""
-    sel = [
-        Samples_Metadata.sample,
-        Samples_Metadata.ETHNICITY,
-        Samples_Metadata.GENDER,
-        Samples_Metadata.AGE,
-        Samples_Metadata.LOCATION,
-        Samples_Metadata.BBTYPE,
-        Samples_Metadata.WFREQ,
-    ]
+    data = {2017 : {monthly_crime_2017, ward_2017}, 2018: {monthly_crime_2018, ward_2018}}
 
-    results = db.session.query(*sel).filter(Samples_Metadata.sample == sample).all()
-
-    # Create a dictionary entry for each row of metadata information
-    sample_metadata = {}
-    for result in results:
-        sample_metadata["sample"] = result[0]
-        sample_metadata["ETHNICITY"] = result[1]
-        sample_metadata["GENDER"] = result[2]
-        sample_metadata["AGE"] = result[3]
-        sample_metadata["LOCATION"] = result[4]
-        sample_metadata["BBTYPE"] = result[5]
-        sample_metadata["WFREQ"] = result[6]
-
-    print(sample_metadata)
-    return jsonify(sample_metadata)
-
-
-@app.route("/samples/<sample>")
-def samples(sample):
-    """Return `otu_ids`, `otu_labels`,and `sample_values`."""
-    stmt = db.session.query(Samples).statement
-    df = pd.read_sql_query(stmt, db.session.bind)
-
-    # Filter the data based on the sample number and
-    # only keep rows with values above 1
-    sample_data = df.loc[df[sample] > 1, ["otu_id", "otu_label", sample]]
-    # Format the data to send as json
-    data = {
-        "otu_ids": sample_data.otu_id.values.tolist(),
-        "sample_values": sample_data[sample].values.tolist(),
-        "otu_labels": sample_data.otu_label.tolist(),
-    }
     return jsonify(data)
 
 

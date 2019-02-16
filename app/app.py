@@ -35,10 +35,10 @@ crime_2018 = Base.classes.Crime_2018
 @app.route("/")
 def index():
     """Return the homepage."""
-    return render_template("chicago.html")
+    return render_template("map.html")
 
 
-@app.route("/all_crime_data/")
+@app.route("/all_crime_data")
 def allCrimeData():
     """Return all crime data"""
     months_array = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']

@@ -19,7 +19,7 @@ app = Flask(__name__)
 # Database Setup
 #################################################
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/bellybutton.sqlite"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/Chicago_Crime_DB.sqlite"
 db = SQLAlchemy(app)
 
 # reflect an existing database into a new model
@@ -41,6 +41,8 @@ def index():
 @app.route("/all_crime_data/")
 def allCrimeData():
     """Return all crime data"""
+    months_array = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
     monthly_crime_2017 = {}
     monthly_crime_2018 = {}
     for month in months_array:
@@ -50,16 +52,19 @@ def allCrimeData():
     ward_2017 = {}
     ward_2018 = {}
     for i in range(1, 51):
-        ward_2017[i] = db.session.query(crime_2017).filter(crime_2017.Ward == float(i)).count()
-        ward_2018[i] = db.session.query(crime_2018).filter(crime_2018.Ward == float(i)).count()
+        ward_2017[str(i)] = db.session.query(crime_2017).filter(crime_2017.Ward == float(i)).count()
+        ward_2018[str(i)] = db.session.query(crime_2018).filter(crime_2018.Ward == float(i)).count()
 
-    data = {2017 : {monthly_crime_2017, ward_2017}, 2018: {monthly_crime_2018, ward_2018}}
+    data = {'2017' : {'monthly_crime': monthly_crime_2017, 'ward_crime': ward_2017}, 
+        '2018': {'monthly_crime': monthly_crime_2018, 'ward_crime': ward_2018}}
 
     return jsonify(data)
 
 @app.route("/crime_data/<crime>")
 def crimeData(year):
     """Return specfic crime data"""
+    months_array = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
     monthly_crime_2017 = {}
     monthly_crime_2018 = {}
     for month in months_array:
@@ -69,10 +74,11 @@ def crimeData(year):
     ward_2017 = {}
     ward_2018 = {}
     for i in range(1, 51):
-        ward_2017[i] = db.session.query(crime_2017).filter(crime_2017.Crime_Type == crime).filter(crime_2017.Ward == float(i)).count()
-        ward_2018[i] = db.session.query(crime_2018).filter(crime_2018.Crime_Type == crime).filter(crime_2018.Ward == float(i)).count()
+        ward_2017[str(i)] = db.session.query(crime_2017).filter(crime_2017.Crime_Type == crime).filter(crime_2017.Ward == float(i)).count()
+        ward_2018[str(i)] = db.session.query(crime_2018).filter(crime_2018.Crime_Type == crime).filter(crime_2018.Ward == float(i)).count()
 
-    data = {2017 : {monthly_crime_2017, ward_2017}, 2018: {monthly_crime_2018, ward_2018}}
+    data = {'2017' : {'monthly_crime': monthly_crime_2017, 'ward_crime': ward_2017}, 
+        '2018': {'monthly_crime': monthly_crime_2018, 'ward_crime': ward_2018}}
 
     return jsonify(data)
 

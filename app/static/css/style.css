@@ -97,8 +97,8 @@ select {
   height: 550px;
   padding: 20px;
   margin: 0;
-  background: black;
-  background-image: url("../images/nasa.jpg");
+  background:whitesmoke;
+  background-image: url("ChicagoSkyline.jpg");
   background-attachment: fixed;
   background-position: bottom center;
   background-size: cover;

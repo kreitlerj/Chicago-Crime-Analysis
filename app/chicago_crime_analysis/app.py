@@ -20,7 +20,7 @@ app.config['JSON_SORT_KEYS'] = False
 # Database Setup
 #################################################
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/Chicago_Crime_DB.sqlite"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', '') or "sqlite:///db/Chicago_Crime_DB.sqlite"
 db = SQLAlchemy(app)
 
 # reflect an existing database into a new model
@@ -104,4 +104,4 @@ def crimeData(crime):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

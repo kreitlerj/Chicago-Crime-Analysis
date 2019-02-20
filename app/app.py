@@ -13,7 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
-
+app.config['JSON_SORT_KEYS'] = False
 
 #################################################
 # Database Setup
@@ -61,7 +61,7 @@ def allCrimeData():
     return jsonify(data)
 
 @app.route("/crime_data/<crime>")
-def crimeData(year):
+def crimeData(crime):
     """Return specfic crime data"""
     months_array = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -79,7 +79,7 @@ def crimeData(year):
 
     data = {'2017' : {'monthly_crime': monthly_crime_2017, 'ward_crime': ward_2017}, 
         '2018': {'monthly_crime': monthly_crime_2018, 'ward_crime': ward_2018}}
-
+    
     return jsonify(data)
 
 

@@ -1,7 +1,4 @@
-
-
-#map,
-body,
-html {
-  height: 100%;
+#map {
+  width: auto;
+  height: 700px;
 }

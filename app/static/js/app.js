@@ -1,26 +1,52 @@
+// Declare global variables to hold data values
 var monthly_2017;
 var monthly_2018;
 var ward_2017;
 var ward_2018;
 
-// function buildLine(year1, year2){
+// Define function to build Linechart
+function buildLine(year1, year2){
+  monthly_2017 = year1;
+  monthly_2018 = year2;
+  console.log(monthly_2017);
+  console.log(monthly_2018);
 
-// };
+  var trace1 = {
+    x: Object.keys(monthly_2017),
+    y: Object.values(monthly_2017),
+    type: "line"
+  };
 
+  var trace2 = {
+    x: Object.keys(monthly_2018),
+    y: Object.values(monthly_2018),
+    type: "line"
+  };
+
+  var data = [trace1, trace2];
+
+  Plotly.newPlot("plot", data);
+};
+
+// Define function to build map
 function buildMap(year1, year2) {
+  // Assign ward data to the global variables
   ward_2017 = year1;
   ward_2018 = year2;
+
+  // Log ward data to the console
   console.log(ward_2017);
   console.log(ward_2018);
 
+  // Color function based off of # of crimes in a ward
   function chooseColor(d) {
     return d > 4000 ? '#800026' :
-           d > 3500  ? '#BD0026' :
-           d > 3000  ? '#E31A1C' :
-           d > 2500  ? '#FC4E2A' :
-           d > 2000   ? '#FD8D3C' :
-           d > 1000   ? '#FEB24C' :
-           d > 500   ? '#FED976' :
+           d > 3250 ? '#BD0026' :
+           d > 2500 ? '#E31A1C' :
+           d > 1500 ? '#FC4E2A' :
+           d > 750  ? '#FD8D3C' :
+           d > 250  ? '#FEB24C' :
+           d > 50   ? '#FED976' :
                       '#FFEDA0';
   };
 
@@ -68,12 +94,17 @@ function buildMap(year1, year2) {
     "Change in Crime": comparison_map
   };
 
+  var container = L.DomUtil.get('map');
+      if(container != null){
+        container._leaflet_id = null;
+      };
+
   var myMap = L.map("map", {
     center: [
-      41.88, -87.63
+      41.845, -87.63
     ],
     zoom: 11,
-    layers: [outdoorsmap, map_2017]
+    layers: [outdoorsmap, comparison_map]
   });
 
   L.control.layers(baseMaps, overlayMaps, {
@@ -83,12 +114,6 @@ function buildMap(year1, year2) {
   // URL for geoJSON data
   var geo_url = "../static/GeoJSON/chi_ward.geojson";
 
-  // d3.json(geo_url, function(data){
-  //   console.log(data.features);
-  //   for (feature in data.features) {
-  //     console.log(feature.properties);
-  //   }
-  // });
   // Create the wards and assign colors based on crime numbers for each overlay map layer
   d3.json(geo_url, function(data) {
     L.geoJSON(data, {
@@ -153,7 +178,7 @@ function updateCharts(crime) {
   }
 
   d3.json(url, function(response) {
-    //buildLine(response["2017"]["monthly_crime"], response["2018"]["monthly_crime"]);
+    buildLine(response["2017"]["monthly_crime"], response["2018"]["monthly_crime"]);
     buildMap(response["2017"]["ward_crime"], response["2018"]["ward_crime"]);
   });
 };

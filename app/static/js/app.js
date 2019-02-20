@@ -11,21 +11,33 @@ function buildLine(year1, year2){
   console.log(monthly_2017);
   console.log(monthly_2018);
 
+  // Trace for 2017
   var trace1 = {
     x: Object.keys(monthly_2017),
     y: Object.values(monthly_2017),
-    type: "line"
+    type: "line",
+    name: "2017"
   };
 
+  // Trace for 2018
   var trace2 = {
     x: Object.keys(monthly_2018),
     y: Object.values(monthly_2018),
-    type: "line"
+    type: "line",
+    name: "2018"
   };
 
   var data = [trace1, trace2];
 
-  Plotly.newPlot("plot", data);
+  // Layout
+  var layout = {
+    title: "Number of Crimes Through the Year",
+    xaxis: { title: "Month"},
+    yaxis: { title: "# of Crimes"}
+  };
+
+  // Add the plot to the html
+  Plotly.newPlot("plot", data, layout);
 };
 
 // Define function to build map
@@ -38,18 +50,7 @@ function buildMap(year1, year2) {
   console.log(ward_2017);
   console.log(ward_2018);
 
-  // Color function based off of # of crimes in a ward
-  function chooseColor(d) {
-    return d > 4000 ? '#800026' :
-           d > 3250 ? '#BD0026' :
-           d > 2500 ? '#E31A1C' :
-           d > 1500 ? '#FC4E2A' :
-           d > 750  ? '#FD8D3C' :
-           d > 250  ? '#FEB24C' :
-           d > 50   ? '#FED976' :
-                      '#FFEDA0';
-  };
-
+  // Define function to determine ward color in the map
   function comparisonColor(ward_1, ward_2) {
     if ((ward_2 - ward_1) < 0) {
       return "green";
@@ -78,9 +79,7 @@ function buildMap(year1, year2) {
     accessToken: API_KEY
   });
 
-  // Create the 3 overlay layers
-  var map_2017 = new L.LayerGroup();
-  var map_2018 = new L.LayerGroup();
+  // Create the overlay layer
   var comparison_map = new L.LayerGroup();
 
   var baseMaps = {
@@ -89,16 +88,16 @@ function buildMap(year1, year2) {
   };
 
   var overlayMaps = {
-    "Ward Crime 2017": map_2017,
-    "Ward Crime 2018": map_2018,
     "Change in Crime": comparison_map
   };
 
+  // Remove the old map when updating for a change in selection
   var container = L.DomUtil.get('map');
       if(container != null){
         container._leaflet_id = null;
       };
 
+  // Add map to the html
   var myMap = L.map("map", {
     center: [
       41.845, -87.63
@@ -107,6 +106,7 @@ function buildMap(year1, year2) {
     layers: [outdoorsmap, comparison_map]
   });
 
+  //Add layer control
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   }).addTo(myMap);
@@ -114,41 +114,7 @@ function buildMap(year1, year2) {
   // URL for geoJSON data
   var geo_url = "../static/GeoJSON/chi_ward.geojson";
 
-  // Create the wards and assign colors based on crime numbers for each overlay map layer
-  d3.json(geo_url, function(data) {
-    L.geoJSON(data, {
-      style: function(feature) {
-        return {
-          color: "white",
-          fillColor: chooseColor(ward_2017[feature.properties.ward]),
-          fillOpacity: 0.5,
-          weight: 1.5
-        };
-      },
-      onEachFeature: function(feature, layer) {
-        layer.bindPopup("<h4>Ward: " + feature.properties.ward +
-          "</h4><hr><p># of Total Crimes: " + ward_2017[feature.properties.ward] + "</p>")
-      }
-    }).addTo(map_2017)
-  });
-
-  d3.json(geo_url, function(data) {
-    L.geoJSON(data, {
-      style: function(feature) {
-        return {
-          color: "white",
-          fillColor: chooseColor(ward_2018[feature.properties.ward]),
-          fillOpacity: 0.5,
-          weight: 1.5
-        };
-      },
-      onEachFeature: function(feature, layer) {
-        layer.bindPopup("<h4>Ward: " + feature.properties.ward +
-          "</h4><hr><p># of Crimes: " + ward_2018[feature.properties.ward] + "</p>")
-      }
-    }).addTo(map_2018)
-  });
-
+  // Create the wards and assign colors based on the change in crime numbers to the overlay map layer
   d3.json(geo_url, function(data) {
     L.geoJSON(data, {
       style: function(feature) {
@@ -167,9 +133,40 @@ function buildMap(year1, year2) {
     }).addTo(comparison_map)
   });
 
+  // color function to be used when creating the legend
+  function getColor(status) {
+    if (status === "Crime Down") {
+      return "green";
+    }
+    else if (status === "No Change") {
+      return "yellow";
+    }
+    else if (status === "Crime Up") {
+      return "red";
+    }
+  };
+
+  // Add legend to the map
+  var legend = L.control({position: 'bottomright'});
+  
+  legend.onAdd = function (map) {
+      var legendDiv =  L.DomUtil.create('div', 'info legend'),
+          status = ["Crime Down", "No Change", "Crime Up"],
+          labels = [];
+      for (var i = 0; i < status.length; i++) {
+            labels.push( 
+                '<i class="square" style="background:' + getColor(status[i]) + '"></i>'+ status[i] + '')
+      }
+        legendDiv.innerHTML = labels.join('<br>');
+      return legendDiv
+  };
+  
+  legend.addTo(myMap);
 };
 
+// Define function to update the charts
 function updateCharts(crime) {
+  // Determine url call based on selection on the webpage
   if (crime === "ALL") {
     var url = "/all_crime_data";
   }
@@ -177,12 +174,14 @@ function updateCharts(crime) {
     var url = "/crime_data/" + crime
   }
 
+  // Use d3 to receive the json data from flask and run it through the charting functions
   d3.json(url, function(response) {
     buildLine(response["2017"]["monthly_crime"], response["2018"]["monthly_crime"]);
     buildMap(response["2017"]["ward_crime"], response["2018"]["ward_crime"]);
   });
 };
 
+// Define function to initialize the page
 function init() {
   updateCharts("ALL");
 };

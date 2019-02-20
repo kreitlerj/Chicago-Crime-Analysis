@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>NYC Boroughs</title>
+    <title>Chicago Crime Rate Analysis App</title>
 
     <!-- Leaflet JS & CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css"
@@ -20,25 +20,25 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12 jumbotron text-center">
-          <h1>Belly Button Biodiversity Dashboard</h1>
-          <p>Use the interactive charts below to explore the dataset</p>
+          <h1>Chicago Crime Analysis Report</h1>
+          <p>Compare violent crime data between 2017 and 2018</p>
         </div>
       </div>
       <div class="row">
         <div class="col-md-3">
           <div class="well">
-            <h5>Select Crime:</h5>
+            <h4>Select Crime:</h4>
             <select onchange="updateCharts(this.value)">
               <option value="ALL">ALL</option>
               <option value="ROBBERY">ROBBERY</option>
-              <option value="ASSAULT/BATTERY">ASSAULT/BATTERY</option>
+              <option value="ASSAULT_BATTERY">ASSAULT/BATTERY</option>
               <option value="HOMICIDE">HOMICIDE</option>
               <option value="KIDNAPPING">KIDNAPPING</option>
               <option value="SEX OFFENSE">SEX OFFENSE</option>
             </select>
           </div>
         </div>
-        <div class="col-md-7">
+        <div class="col-md-9">
           <div id="plot"></div>
         </div>
       </div>
@@ -48,6 +48,12 @@
       <div class="col-md-6">
         <div id="map"></div>
       </div>
+    </div>
+    <br>
+    </div>
+      <footer class="footer">
+        <span class="bottom"> </span>
+      </footer>
     </div>
     
     

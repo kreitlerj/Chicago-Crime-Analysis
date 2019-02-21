@@ -127,7 +127,7 @@ function buildMap(year1, year2) {
       },
       onEachFeature: function(feature, layer) {
         layer.bindPopup("<h4>Ward: " + feature.properties.ward +
-          "</h4><br><p>2017: " + ward_2017[feature.properties.ward] +
+          "</h4><hr><p>2017: " + ward_2017[feature.properties.ward] +
           "<p>2018: " + ward_2018[feature.properties.ward] +
           "<p>Change in Crime: " + (ward_2018[feature.properties.ward] - ward_2017[feature.properties.ward]) + 
           "</p>")

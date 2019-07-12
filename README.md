@@ -15,13 +15,13 @@ App Deployment: [Chicago Crime App](https://chicago-crime-analysis.herokuapp.com
 * Plotly.js
 * Leaflet.js
 * Flask
-* SQLlite
+* SQLite
 * SQLAlchemy
 * Pandas
 * Jupyter Notebook
 
 ### Description
-This project is to show how to take city crime data and use it in a dashboard page. The data used was provided by the city of Chicago, which has data all the way back to 2001. The ETL cleans the data and pulls out the years 2017 and 2018 for comparision on the dashboard.  To compare any two years, you just need to edit the ETL script to the years to be compared. From there, the data is saved into a SQLlite file. Once the app initializes, it pulls all the data for the visualizations from the SQLlite file using Python and Flask and then returns it to the JavaScript. Using [Plotly.js](https://plot.ly/javascript/) and [Leaflet.js](https://leafletjs.com/index.html), visualizations are made comparing the two years of crime data. The user can then filter the data through a dropdown menu into different crime categories.
+This project is to show how to take city crime data and use it in a dashboard page. The data used was provided by the city of Chicago, which has data all the way back to 2001. The ETL cleans the data and pulls out the years 2017 and 2018 for comparision on the dashboard.  To compare any two years, you just need to edit the ETL script to the years to be compared. From there, the data is saved into a SQLite file. Once the app initializes, it pulls all the data for the visualizations from the SQLite file using Python and Flask and then returns it to the JavaScript. Using [Plotly.js](https://plot.ly/javascript/) and [Leaflet.js](https://leafletjs.com/index.html), visualizations are made comparing the two years of crime data. The user can then filter the data through a dropdown menu into different crime categories.
 #### Visualizations:
 ##### Line Graph: 
 Compares the number of crimes per month for each year. Useful to see how crime is either increasing or decreasing throughout the year.
